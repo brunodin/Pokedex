@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.bruno.pokedex.theme.PokedexTheme
+import com.bruno.pokedex.ui.detailpokemon.DetailPokemonScreen
 import com.bruno.pokedex.ui.pokemon.PokemonScreen
 
 class MainActivity : ComponentActivity() {
@@ -23,7 +24,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
-                    PokemonScreen()
+                    DetailPokemonScreen()
                 }
             }
         }

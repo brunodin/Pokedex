@@ -2,11 +2,17 @@ package com.bruno.pokedex.ui.pokemon
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
@@ -16,7 +22,12 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.GridCells
+import androidx.compose.foundation.lazy.LazyVerticalGrid
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Card
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
@@ -62,6 +73,7 @@ private fun Screen() {
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .verticalScroll(rememberScrollState()),
         ) {
             var height = LocalConfiguration.current.screenHeightDp.dp.value
             Column(
@@ -112,19 +124,40 @@ private fun Screen() {
                     )
                 }
             }
-            PokemonCard()
+            PokemonList()
+        }
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+private fun PokemonList() {
+    val list: List<Int> = (1..15).map { it }
+
+    list.chunked(2).forEach {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 10.dp),
+            horizontalArrangement = Arrangement.spacedBy(space = 10.dp),
+
+            ) {
+            it.forEach {
+                PokemonCard()
+            }
+            if (it.size != 2) Spacer(modifier = Modifier.weight(1f))
         }
     }
 }
 
 @Composable
-private fun PokemonCard() {
+private fun RowScope.PokemonCard() {
     Card(
         shape = RoundedCornerShape(10.dp),
         modifier = Modifier
-            .padding(all = 20.dp)
-            .width(240.dp)
-            .height(240.dp),
+            .padding(top = 20.dp)
+            .aspectRatio(0.9f)
+            .weight(1f, fill = true),
         border = BorderStroke(width = 2.dp, color = Support300),
         elevation = 10.dp
     ) {
@@ -151,7 +184,7 @@ private fun PokemonCard() {
             ) {
                 Image(
                     painter = painterResource(id = R.drawable.image),
-                    modifier = Modifier.size(134.dp),
+                    modifier = Modifier.size(100.dp),
                     contentDescription = null
                 )
             }
