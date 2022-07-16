@@ -7,17 +7,20 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Card
+import androidx.compose.material.Divider
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -29,9 +32,11 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -181,8 +186,23 @@ private fun Screen() {
                             }
                         }
                     }
-
-
+                    Spacer(modifier = Modifier.height(30.dp))
+                    Text(
+                        modifier = Modifier.padding(
+                            horizontal = 15.dp,
+                            vertical = 5.dp
+                        ),
+                        text = stringResource(id = R.string.pokemon_details_base_stats),
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Support200
+                    )
+                    Divider(
+                        modifier = Modifier.padding(horizontal = 30.dp, vertical = 5.dp),
+                        color = Support300,
+                        thickness = 1.5.dp,
+                    )
+                    StatsBar(progress = 0.9f)
                 }
                 Image(
                     painter = painterResource(id = R.drawable.image),
@@ -193,6 +213,38 @@ private fun Screen() {
                 )
             }
         }
+    }
+}
+@Composable
+fun StatsBar(
+    progressColor: Color = Primary100,
+    progress: Float
+) {
+    Box(
+        modifier = Modifier
+            .height(200.dp)
+            .width(25.dp)
+            .clip(shape = CircleShape)
+            .background(color = Support100, shape = CircleShape)
+            .border(
+                width = 1.dp,
+                shape = CircleShape,
+                color = Support200
+            )
+            .graphicsLayer { rotationX = 180f }
+    ) {
+        Spacer(
+            modifier = Modifier
+                .height((progress*200).dp)
+                .width(30.dp)
+                .clip(shape = CircleShape)
+                .background(color = Primary100, shape = CircleShape)
+                .border(
+                    width = 1.dp,
+                    shape = CircleShape,
+                    color = Support200
+                )
+        )
     }
 }
 
