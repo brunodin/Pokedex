@@ -8,6 +8,7 @@ import com.bruno.pokedex.domain.usecase.FilterValuesUseCase
 import com.bruno.pokedex.domain.usecase.GetPokemonPaginatedUseCase
 import com.bruno.pokedex.presentation.ui.pokemon.PokemonScreenAction.EndReachedAction
 import com.bruno.pokedex.presentation.ui.pokemon.PokemonScreenAction.PokemonClickedAction
+import com.bruno.pokedex.presentation.ui.pokemon.PokemonScreenAction.RetryAction
 import com.bruno.pokedex.presentation.ui.pokemon.PokemonScreenAction.SearchChangedAction
 import com.bruno.pokedex.presentation.ui.pokemon.PokemonScreenAction.SearchClickedAction
 import com.bruno.pokedex.presentation.ui.pokemon.PokemonViewModel.ScreenEvent
@@ -42,6 +43,7 @@ class PokemonViewModel @Inject constructor(
             SearchClickedAction -> filterPokemon()
             is SearchChangedAction -> performUpdateSearch(action.search)
             EndReachedAction -> performNextPaginationRequest()
+            RetryAction -> fetchGetPokemonPaginated()
         }
     }
 
@@ -63,7 +65,8 @@ class PokemonViewModel @Inject constructor(
 
     private fun performNextPaginationRequest() {
         val isLoading = uiState.isLoading.value
-        if (pokemonList.size >= count || isLoading || isInSearch.isNotEmpty()) return
+        val isError = uiState.isError.value
+        if (pokemonList.size >= count || isLoading || isInSearch.isNotEmpty() || isError) return
         fetchGetPokemonPaginated()
     }
 

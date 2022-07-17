@@ -11,13 +11,13 @@ object PokemonDetailMapper {
 
     fun PokemonDetailResponse.toPokemonDetail() = PokemonDetail(
         baseExperience = this.baseExperience.orZero(),
-        height = this.height.orZero(),
+        height = this.height?.toFloat().orZero(),
         id = this.id.orZero(),
         name = this.name.orEmpty(),
         sprites = this.sprites.toSprites(),
         stats = this.stats?.map { it.toStatsDetail() }.orEmpty(),
         types = this.types?.map { it.toTypeDetail() }.orEmpty(),
-        weight = this.weight.orZero()
+        weight = this.weight?.toFloat().orZero()
 
     )
 }

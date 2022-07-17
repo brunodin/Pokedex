@@ -60,8 +60,10 @@ import com.bruno.pokedex.presentation.theme.Support200
 import com.bruno.pokedex.presentation.theme.Support300
 import com.bruno.pokedex.presentation.ui.common.ColumnWithGradient
 import com.bruno.pokedex.presentation.ui.common.DefaultImage
+import com.bruno.pokedex.presentation.ui.common.IconImageButton
 import com.bruno.pokedex.presentation.ui.pokemon.PokemonScreenAction.EndReachedAction
 import com.bruno.pokedex.presentation.ui.pokemon.PokemonScreenAction.PokemonClickedAction
+import com.bruno.pokedex.presentation.ui.pokemon.PokemonScreenAction.RetryAction
 import com.bruno.pokedex.presentation.ui.pokemon.PokemonScreenAction.SearchChangedAction
 import com.bruno.pokedex.presentation.ui.pokemon.PokemonScreenAction.SearchClickedAction
 import com.bruno.pokedex.presentation.ui.pokemon.PokemonScreenUiState.ScreenState
@@ -117,6 +119,7 @@ private fun ScreenSuccess(
 ) {
     val pokemonList by uiState.pokemonList.collectAsState()
     val isLoading by uiState.isLoading.collectAsState()
+    val isError by uiState.isError.collectAsState()
     LazyColumn(
         state = rememberEndReachedState(onEndReached = { onEvent(EndReachedAction) })
     ) {
@@ -132,13 +135,42 @@ private fun ScreenSuccess(
                 TextFieldWithBorder(uiState = uiState, onEvent = onEvent)
             }
         }
-        items(items = pokemonList.chunked(COLUMN_GRID)) { pokemonList ->
-            PokemonGrid(pokemonList = pokemonList, onEvent = onEvent)
+        if (pokemonList.isNotEmpty()) {
+            items(items = pokemonList.chunked(COLUMN_GRID)) { pokemonList ->
+                PokemonGrid(pokemonList = pokemonList, onEvent = onEvent)
+            }
+        } else {
+            item {
+                PokemonNotFound()
+            }
         }
         item {
             Spacer(modifier = Modifier.height(20.dp))
             if (isLoading) CircularLoading(modifier = Modifier.padding(all = 20.dp))
+            if (isError) RetryIconButton(onEvent = onEvent)
         }
+    }
+}
+
+@Composable
+private fun PokemonNotFound() {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 20.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        DefaultImage(
+            painter = painterResource(id = R.drawable.ic_search_off),
+            modifier = Modifier.size(123.dp)
+        )
+        Text(
+            modifier = Modifier.padding(horizontal = 15.dp),
+            text = stringResource(id = R.string.pokemon_search_not_found),
+            fontSize = 20.sp,
+            fontWeight = FontWeight.Bold,
+            color = Support200
+        )
     }
 }
 
@@ -210,6 +242,22 @@ private fun PokemonCard(
                 )
             }
         }
+    }
+}
+
+@Composable
+private fun RetryIconButton(
+    onEvent: (PokemonScreenAction) -> Unit
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.Center
+    ) {
+        IconImageButton(
+            painter = painterResource(id = R.drawable.ic_reload),
+            modifier = Modifier.size(50.dp),
+            onClick = { onEvent(RetryAction) }
+        )
     }
 }
 

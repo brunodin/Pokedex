@@ -7,4 +7,5 @@ sealed class PokemonScreenAction {
     data class PokemonClickedAction(val pokemon: Pokemon) : PokemonScreenAction()
     object SearchClickedAction : PokemonScreenAction()
     object EndReachedAction : PokemonScreenAction()
+    object RetryAction : PokemonScreenAction()
 }

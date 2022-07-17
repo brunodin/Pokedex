@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -34,7 +33,6 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -83,7 +81,7 @@ private fun Screen(uiState: DetailPokemonScreenUiState) {
                 Column(
                     modifier = Modifier
                         .offset(y = 75.dp)
-                        .padding(end = 20.dp, start = 20.dp, bottom = 75.dp + 20.dp)
+                        .padding(end = 20.dp, start = 20.dp, bottom = 20.dp)
                         .background(color = Support100, shape = MaterialTheme.shapes.medium),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
@@ -137,7 +135,7 @@ private fun StatusBarRow(uiState: DetailPokemonScreenUiState) {
     ) {
         pokemonDetail.baseStats.forEach { baseStat ->
             StatsBar(
-                progress = baseStat.percentage.toFloat(),
+                progress = baseStat.percentage,
                 name = baseStat.stats.stats(),
                 progressColor = baseStat.stats.color()
             )
@@ -246,7 +244,7 @@ private fun PokemonCardName(uiState: DetailPokemonScreenUiState) {
 private fun StatsBar(
     progressColor: Color = Primary100,
     name: String,
-    progress: Float
+    progress: Int
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally
@@ -269,7 +267,7 @@ private fun StatsBar(
                 Spacer(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(((progress/100) * 200).dp)
+                        .height(((progress.toFloat() / 100) * 200).dp)
                         .clip(shape = CircleShape)
                         .background(color = progressColor, shape = CircleShape)
                         .border(
@@ -291,7 +289,7 @@ private fun StatsBar(
             )
         }
         Text(
-            text = progress.toString(),
+            text = stringResource(id = R.string.pokemon_details_percentage, progress),
             fontSize = 13.sp,
             modifier = Modifier
                 .padding(top = 5.dp)

@@ -15,5 +15,5 @@ data class PokemonDetailScreenValue(
 
 data class BaseStatsScreenValue(
     val stats: PokemonStatsEnum,
-    val percentage: Double,
+    val percentage: Int,
 )

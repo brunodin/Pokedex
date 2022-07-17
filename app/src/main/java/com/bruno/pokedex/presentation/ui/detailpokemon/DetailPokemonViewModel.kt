@@ -25,7 +25,7 @@ class DetailPokemonViewModel @Inject constructor(
 
     private fun fetchPokemonDetails() = viewModelScope.launch {
         getPokemonDetailUseCase.execute(pokemonId)
-        val pokemonDetail = getPokemonDetailUseCase.execute(pokemonId).getOrElse {  }
+        val pokemonDetail = getPokemonDetailUseCase.execute(pokemonId).getOrElse { }
         if (pokemonDetail !is PokemonDetail) return@launch
         uiState.pokemonDetail.value = pokemonDetail.toPokemonDetailScreen()
     }
