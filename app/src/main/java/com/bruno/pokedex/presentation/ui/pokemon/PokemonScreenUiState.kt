@@ -8,15 +8,21 @@ class PokemonScreenUiState {
 
     val search = MutableStateFlow(EMPTY_STRING)
     val pokemonList = MutableStateFlow(emptyList<Pokemon>())
+    val isLoading = MutableStateFlow(false)
     val screenState = MutableStateFlow<ScreenState>(ScreenState.Loading)
 
-    fun onFailure() {
+    fun onFailure(isFirstPage: () -> Boolean) {
         screenState.value = ScreenState.Failure
+        isLoading.value = true
+    }
+    fun onLoading(isFirstPage: () -> Boolean) {
+        if (isFirstPage()) screenState.value = ScreenState.Loading else isLoading.value = true
     }
 
     fun onSuccess(pokemonList: List<Pokemon>) {
         this.pokemonList.value = pokemonList
         screenState.value = ScreenState.Success
+        isLoading.value = false
     }
 
     sealed class ScreenState {

@@ -83,7 +83,7 @@ private fun Screen(uiState: DetailPokemonScreenUiState) {
                 Column(
                     modifier = Modifier
                         .offset(y = 75.dp)
-                        .padding(end = 20.dp, start = 20.dp, bottom = 20.dp)
+                        .padding(end = 20.dp, start = 20.dp, bottom = 75.dp + 20.dp)
                         .background(color = Support100, shape = MaterialTheme.shapes.medium),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {

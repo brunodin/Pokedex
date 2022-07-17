@@ -11,7 +11,12 @@ class GetPokemonPaginatedUseCase @Inject constructor(
     private val dispatcher: CoroutineDispatcher
 ) {
 
-    suspend fun execute(): Result<PokemonPaginated> = withContext(dispatcher) {
-        repository.getPokemonPaginated()
+    suspend fun execute(page: Int): Result<PokemonPaginated> = withContext(dispatcher) {
+        val newOffset = page * OFFSET
+        repository.getPokemonPaginated(newOffset)
+    }
+
+    private companion object {
+        const val OFFSET = 20
     }
 }

@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -59,11 +60,13 @@ import com.bruno.pokedex.presentation.theme.Support200
 import com.bruno.pokedex.presentation.theme.Support300
 import com.bruno.pokedex.presentation.ui.common.ColumnWithGradient
 import com.bruno.pokedex.presentation.ui.common.DefaultImage
+import com.bruno.pokedex.presentation.ui.pokemon.PokemonScreenAction.EndReachedAction
 import com.bruno.pokedex.presentation.ui.pokemon.PokemonScreenAction.PokemonClickedAction
 import com.bruno.pokedex.presentation.ui.pokemon.PokemonScreenAction.SearchChangedAction
 import com.bruno.pokedex.presentation.ui.pokemon.PokemonScreenAction.SearchClickedAction
 import com.bruno.pokedex.presentation.ui.pokemon.PokemonScreenUiState.ScreenState
 import com.bruno.pokedex.presentation.ui.pokemon.PokemonViewModel.ScreenEvent
+import com.bruno.pokedex.util.rememberEndReachedState
 import kotlinx.coroutines.flow.collect
 
 private const val COLUMN_GRID = 2
@@ -113,7 +116,10 @@ private fun ScreenSuccess(
     onEvent: (PokemonScreenAction) -> Unit
 ) {
     val pokemonList by uiState.pokemonList.collectAsState()
-    LazyColumn {
+    val isLoading by uiState.isLoading.collectAsState()
+    LazyColumn(
+        state = rememberEndReachedState(onEndReached = { onEvent(EndReachedAction) })
+    ) {
         item {
             ColumnWithGradient(
                 paddingValues = PaddingValues(all = 20.dp),
@@ -128,6 +134,10 @@ private fun ScreenSuccess(
         }
         items(items = pokemonList.chunked(COLUMN_GRID)) { pokemonList ->
             PokemonGrid(pokemonList = pokemonList, onEvent = onEvent)
+        }
+        item {
+            Spacer(modifier = Modifier.height(20.dp))
+            if (isLoading) CircularLoading(modifier = Modifier.padding(all = 20.dp))
         }
     }
 }
@@ -200,6 +210,19 @@ private fun PokemonCard(
                 )
             }
         }
+    }
+}
+
+@Composable
+private fun CircularLoading(modifier: Modifier = Modifier) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.Center
+    ) {
+        CircularProgressIndicator(
+            color = Secondary100,
+            modifier = modifier
+        )
     }
 }
 
