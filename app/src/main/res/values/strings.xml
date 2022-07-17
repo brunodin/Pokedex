@@ -1,5 +1,15 @@
 <resources>
+    <!--    Pokemon-->
     <string name="app_name">Pokedex</string>
     <string name="pokemon_search">Search here</string>
+    <!--    Detail-->
     <string name="pokemon_details_base_stats">Base stats</string>
+    <string name="pokemon_details_kg">%fkg</string>
+    <string name="pokemon_details_meter">%fm</string>
+    <string name="pokemon_details_hp">Hp</string>
+    <string name="pokemon_details_atk">Atk</string>
+    <string name="pokemon_details_def">Def</string>
+    <string name="pokemon_details_special_atk">SpdAtk</string>
+    <string name="pokemon_details_special_def">SpdDef</string>
+    <string name="pokemon_details_speed">Spd</string>
 </resources>

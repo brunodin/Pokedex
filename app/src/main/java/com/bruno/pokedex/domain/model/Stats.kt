@@ -1,6 +1,6 @@
 package com.bruno.pokedex.domain.model
 
 data class Stats(
-    val name: String,
+    val stats: PokemonStatsEnum,
     val url: String
 )

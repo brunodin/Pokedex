@@ -7,6 +7,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
@@ -56,6 +57,8 @@ import com.bruno.pokedex.presentation.theme.Secondary100
 import com.bruno.pokedex.presentation.theme.Support100
 import com.bruno.pokedex.presentation.theme.Support200
 import com.bruno.pokedex.presentation.theme.Support300
+import com.bruno.pokedex.presentation.ui.common.ColumnWithGradient
+import com.bruno.pokedex.presentation.ui.common.DefaultImage
 import com.bruno.pokedex.presentation.ui.pokemon.PokemonScreenAction.PokemonClickedAction
 import com.bruno.pokedex.presentation.ui.pokemon.PokemonScreenAction.SearchChangedAction
 import com.bruno.pokedex.presentation.ui.pokemon.PokemonScreenAction.SearchClickedAction
@@ -112,7 +115,13 @@ private fun ScreenSuccess(
     val pokemonList by uiState.pokemonList.collectAsState()
     LazyColumn {
         item {
-            ColumnWithGradient {
+            ColumnWithGradient(
+                paddingValues = PaddingValues(all = 20.dp),
+                colors = listOf(Primary100, Secondary100),
+                endY = 0.6f,
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(space = 20.dp)
+            ) {
                 DefaultImage(painter = painterResource(id = R.drawable.ic_logo))
                 TextFieldWithBorder(uiState = uiState, onEvent = onEvent)
             }
@@ -191,40 +200,6 @@ private fun PokemonCard(
                 )
             }
         }
-    }
-}
-
-@Composable
-private fun DefaultImage(painter: Painter, modifier: Modifier = Modifier) {
-    Image(
-        painter = painter,
-        contentDescription = null,
-        modifier = modifier
-    )
-}
-
-@Composable
-private fun ColumnWithGradient(content: @Composable () -> Unit) {
-    var height = LocalConfiguration.current.screenHeightDp.dp.value
-    Column(
-        modifier = Modifier
-            .onGloballyPositioned {
-                height = it.size.height.toFloat()
-            }
-            .background(
-                brush = Brush.verticalGradient(
-                    colors = listOf(
-                        Primary100,
-                        Secondary100
-                    ),
-                    endY = (height * 0.6f)
-                )
-            )
-            .padding(all = 20.dp),
-        verticalArrangement = Arrangement.spacedBy(space = 40.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        content()
     }
 }
 

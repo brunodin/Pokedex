@@ -3,8 +3,8 @@ package com.bruno.pokedex.presentation.ui.detailpokemon
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.bruno.pokedex.domain.model.PokemonDetail
-import com.bruno.pokedex.domain.model.PokemonPaginated
 import com.bruno.pokedex.domain.usecase.GetPokemonDetailUseCase
+import com.bruno.pokedex.presentation.ui.detailpokemon.mapper.toPokemonDetailScreen
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.launch
@@ -27,7 +27,6 @@ class DetailPokemonViewModel @Inject constructor(
         getPokemonDetailUseCase.execute(pokemonId)
         val pokemonDetail = getPokemonDetailUseCase.execute(pokemonId).getOrElse {  }
         if (pokemonDetail !is PokemonDetail) return@launch
-        uiState.name.value = pokemonDetail.name
-        uiState.image.value = pokemonDetail.sprites.other.officialArtwork.frontDefault
+        uiState.pokemonDetail.value = pokemonDetail.toPokemonDetailScreen()
     }
 }
