@@ -3,6 +3,7 @@ package com.bruno.pokedex.presentation.ui.pokemon
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,7 +17,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Card
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.material.TextFieldDefaults
@@ -29,6 +33,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.focus.onFocusEvent
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.painter.Painter
@@ -37,10 +42,12 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import coil.compose.rememberAsyncImagePainter
+import coil.compose.SubcomposeAsyncImage
 import com.bruno.pokedex.R
 import com.bruno.pokedex.domain.model.Pokemon
 import com.bruno.pokedex.presentation.theme.PokedexTheme
@@ -49,55 +56,87 @@ import com.bruno.pokedex.presentation.theme.Secondary100
 import com.bruno.pokedex.presentation.theme.Support100
 import com.bruno.pokedex.presentation.theme.Support200
 import com.bruno.pokedex.presentation.theme.Support300
+import com.bruno.pokedex.presentation.ui.pokemon.PokemonScreenAction.PokemonClickedAction
+import com.bruno.pokedex.presentation.ui.pokemon.PokemonScreenAction.SearchChangedAction
+import com.bruno.pokedex.presentation.ui.pokemon.PokemonScreenAction.SearchClickedAction
 import com.bruno.pokedex.presentation.ui.pokemon.PokemonScreenUiState.ScreenState
+import com.bruno.pokedex.presentation.ui.pokemon.PokemonViewModel.ScreenEvent
+import kotlinx.coroutines.flow.collect
 
 private const val COLUMN_GRID = 2
 
 @Composable
-fun PokemonScreen(viewModel: PokemonViewModel = hiltViewModel()) {
+fun PokemonScreen(
+    viewModel: PokemonViewModel = hiltViewModel(),
+    onNextScreen: (Pokemon) -> Unit
+) {
     LaunchedEffect(key1 = Unit) { viewModel.setup() }
-    Screen(uiState = viewModel.uiState)
+    Screen(uiState = viewModel.uiState, onEvent = viewModel::onEvent)
+    EventConsumer(viewModel = viewModel, onNextScreen = onNextScreen)
 }
 
 @Composable
-private fun Screen(uiState: PokemonScreenUiState) {
-    val screenState by uiState.screenState.collectAsState()
-    PokedexTheme {
-        when(screenState) {
-            ScreenState.Failure -> {}
-            ScreenState.Loading -> {}
-            ScreenState.Success -> ScreenSuccess(uiState = uiState)
+private fun EventConsumer(
+    viewModel: PokemonViewModel,
+    onNextScreen: (Pokemon) -> Unit
+) {
+    LaunchedEffect(key1 = Unit) {
+        viewModel.eventFlow.collect { event ->
+            when(event) {
+                is ScreenEvent.NavigateToScreen -> { onNextScreen(event.pokemon) }
+            }
         }
     }
 }
 
 @Composable
-private fun ScreenSuccess(uiState: PokemonScreenUiState) {
+private fun Screen(
+    uiState: PokemonScreenUiState,
+    onEvent: (PokemonScreenAction) -> Unit
+) {
+    val screenState by uiState.screenState.collectAsState()
+    PokedexTheme {
+        when (screenState) {
+            ScreenState.Failure -> {}
+            ScreenState.Loading -> {}
+            ScreenState.Success -> ScreenSuccess(uiState = uiState, onEvent = onEvent)
+        }
+    }
+}
+
+@Composable
+private fun ScreenSuccess(
+    uiState: PokemonScreenUiState,
+    onEvent: (PokemonScreenAction) -> Unit
+) {
     val pokemonList by uiState.pokemonList.collectAsState()
     LazyColumn {
         item {
             ColumnWithGradient {
                 DefaultImage(painter = painterResource(id = R.drawable.ic_logo))
-                TextFieldWithBorder(uiState = uiState, onValueChanged = {})
+                TextFieldWithBorder(uiState = uiState, onEvent = onEvent)
             }
         }
         items(items = pokemonList.chunked(COLUMN_GRID)) { pokemonList ->
-            PokemonGrid(pokemonList = pokemonList)
+            PokemonGrid(pokemonList = pokemonList, onEvent = onEvent)
         }
     }
 }
 
 @Composable
-private fun PokemonGrid(pokemonList: List<Pokemon>) {
+private fun PokemonGrid(
+    pokemonList: List<Pokemon>,
+    onEvent: (PokemonScreenAction) -> Unit
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 10.dp),
         horizontalArrangement = Arrangement.spacedBy(space = 10.dp),
-        ) {
+    ) {
         pokemonList.forEach { pokemon ->
             Box(modifier = Modifier.weight(1f, fill = true)) {
-                PokemonCard(pokemon = pokemon)
+                PokemonCard(pokemon = pokemon, onEvent = onEvent)
             }
         }
         if (pokemonList.size != COLUMN_GRID) Spacer(modifier = Modifier.weight(1f))
@@ -105,12 +144,16 @@ private fun PokemonGrid(pokemonList: List<Pokemon>) {
 }
 
 @Composable
-private fun PokemonCard(pokemon: Pokemon) {
+private fun PokemonCard(
+    pokemon: Pokemon,
+    onEvent: (PokemonScreenAction) -> Unit
+) {
     Card(
         shape = RoundedCornerShape(10.dp),
         modifier = Modifier
             .padding(top = 20.dp)
-            .aspectRatio(0.9f),
+            .aspectRatio(0.9f)
+            .clickable(onClick = { onEvent(PokemonClickedAction(pokemon)) }),
         border = BorderStroke(width = 2.dp, color = Support300),
         elevation = 10.dp
     ) {
@@ -135,11 +178,16 @@ private fun PokemonCard(pokemon: Pokemon) {
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
-                DefaultImage(
-                    painter = rememberAsyncImagePainter(
-                        model = pokemon.imageUrl,
-                    ),
+                SubcomposeAsyncImage(
                     modifier = Modifier.size(100.dp),
+                    model = pokemon.imageUrl,
+                    loading = {
+                        CircularProgressIndicator(
+                            color = Secondary100,
+                            modifier = Modifier.scale(0.5f)
+                        )
+                    },
+                    contentDescription = null
                 )
             }
         }
@@ -183,7 +231,7 @@ private fun ColumnWithGradient(content: @Composable () -> Unit) {
 @Composable
 private fun TextFieldWithBorder(
     uiState: PokemonScreenUiState,
-    onValueChanged: (String) -> Unit
+    onEvent: (PokemonScreenAction) -> Unit
 ) {
     val search by uiState.search.collectAsState()
     Box {
@@ -193,13 +241,18 @@ private fun TextFieldWithBorder(
                 .fillMaxWidth()
                 .onFocusEvent { isFocused = it.isFocused },
             value = search,
-            onValueChange = onValueChanged,
+            onValueChange = { onEvent(SearchChangedAction(it)) },
             colors = TextFieldDefaults.outlinedTextFieldColors(
                 backgroundColor = Support100,
                 unfocusedBorderColor = Support200,
                 focusedBorderColor = Support200,
                 focusedLabelColor = Support200
             ),
+            keyboardOptions = KeyboardOptions.Default.copy(
+                capitalization = KeyboardCapitalization.Sentences,
+                imeAction = ImeAction.Search
+            ),
+            keyboardActions = KeyboardActions(onSearch = { onEvent(SearchClickedAction) }),
             leadingIcon = {
                 Image(
                     painter = painterResource(id = R.drawable.ic_search),
@@ -207,7 +260,7 @@ private fun TextFieldWithBorder(
                 )
             },
             label = {
-                if (isFocused.not()) Text(text = stringResource(id = R.string.pokemon_search))
+                if (isFocused.not() && search.isEmpty()) Text(text = stringResource(id = R.string.pokemon_search))
             }
         )
     }

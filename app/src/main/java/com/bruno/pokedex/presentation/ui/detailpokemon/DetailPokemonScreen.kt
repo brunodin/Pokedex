@@ -48,7 +48,7 @@ import com.bruno.pokedex.presentation.theme.Support200
 import com.bruno.pokedex.presentation.theme.Support300
 
 @Composable
-fun DetailPokemonScreen() {
+fun DetailPokemonScreen(pokemonId: Int) {
     Screen()
 }
 

@@ -14,8 +14,8 @@ class PokemonRepositoryImpl @Inject constructor(
     private val coroutineDispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : PokemonRepository {
 
-    override suspend fun getPokemonPaginated(search: String): Result<PokemonPaginated> =
+    override suspend fun getPokemonPaginated(): Result<PokemonPaginated> =
         safeRequest(coroutineDispatcher) {
-            api.getPokemonPaginated(search).toPokemonPaginated()
+            api.getPokemonPaginated().toPokemonPaginated()
         }
 }
