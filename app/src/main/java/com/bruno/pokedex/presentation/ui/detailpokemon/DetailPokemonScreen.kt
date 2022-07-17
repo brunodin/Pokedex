@@ -1,4 +1,4 @@
-package com.bruno.pokedex.ui.detailpokemon
+package com.bruno.pokedex.presentation.ui.detailpokemon
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -19,7 +19,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Card
 import androidx.compose.material.Divider
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
@@ -38,16 +37,15 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.bruno.pokedex.R
-import com.bruno.pokedex.theme.PokedexTheme
-import com.bruno.pokedex.theme.Primary100
-import com.bruno.pokedex.theme.Secondary100
-import com.bruno.pokedex.theme.Support100
-import com.bruno.pokedex.theme.Support200
-import com.bruno.pokedex.theme.Support300
+import com.bruno.pokedex.presentation.theme.PokedexTheme
+import com.bruno.pokedex.presentation.theme.Primary100
+import com.bruno.pokedex.presentation.theme.Secondary100
+import com.bruno.pokedex.presentation.theme.Support100
+import com.bruno.pokedex.presentation.theme.Support200
+import com.bruno.pokedex.presentation.theme.Support300
 
 @Composable
 fun DetailPokemonScreen() {
@@ -202,7 +200,19 @@ private fun Screen() {
                         color = Support300,
                         thickness = 1.5.dp,
                     )
-                    StatsBar(progress = 0.9f)
+                    Row(
+                        modifier = Modifier
+                            .padding(vertical = 10.dp)
+                            .fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceEvenly
+                    ) {
+                        StatsBar(progress = 0.9f)
+                        StatsBar(progress = 0.9f)
+                        StatsBar(progress = 0.9f)
+                        StatsBar(progress = 0.9f)
+                        StatsBar(progress = 0.9f)
+                        StatsBar(progress = 0.9f)
+                    }
                 }
                 Image(
                     painter = painterResource(id = R.drawable.image),
@@ -215,35 +225,65 @@ private fun Screen() {
         }
     }
 }
+
 @Composable
 fun StatsBar(
     progressColor: Color = Primary100,
     progress: Float
 ) {
-    Box(
-        modifier = Modifier
-            .height(200.dp)
-            .width(25.dp)
-            .clip(shape = CircleShape)
-            .background(color = Support100, shape = CircleShape)
-            .border(
-                width = 1.dp,
-                shape = CircleShape,
-                color = Support200
-            )
-            .graphicsLayer { rotationX = 180f }
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Spacer(
+        Row(
             modifier = Modifier
-                .height((progress*200).dp)
-                .width(30.dp)
-                .clip(shape = CircleShape)
-                .background(color = Primary100, shape = CircleShape)
-                .border(
-                    width = 1.dp,
-                    shape = CircleShape,
-                    color = Support200
+                .graphicsLayer {
+                    rotationZ = 180f
+                }
+        ) {
+            Box(
+                modifier = Modifier
+                    .padding(start = 20.dp)
+                    .height(200.dp)
+                    .width(15.dp)
+                    .clip(shape = CircleShape)
+                    .background(color = Support100, shape = CircleShape)
+                    .border(
+                        width = 1.dp,
+                        shape = CircleShape,
+                        color = Support200
+                    )
+            ) {
+                Spacer(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height((progress * 200).dp)
+                        .clip(shape = CircleShape)
+                        .background(color = progressColor, shape = CircleShape)
+                        .border(
+                            width = 1.dp,
+                            shape = CircleShape,
+                            color = Support200
+                        )
                 )
+            }
+            Spacer(modifier = Modifier.height(10.dp))
+            Text(
+                text = "HP",
+                fontSize = 13.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier
+                    .padding(top = 10.dp)
+                    .graphicsLayer {
+                        rotationZ = 90f
+                    }
+            )
+        }
+
+        Text(
+            text = "100%",
+            fontSize = 13.sp,
+            modifier = Modifier
+                .padding(top = 5.dp)
         )
     }
 }

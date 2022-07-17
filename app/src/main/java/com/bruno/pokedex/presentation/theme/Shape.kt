@@ -1,4 +1,4 @@
-package com.bruno.pokedex.theme
+package com.bruno.pokedex.presentation.theme
 
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Shapes

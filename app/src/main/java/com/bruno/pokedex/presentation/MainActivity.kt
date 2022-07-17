@@ -1,4 +1,4 @@
-package com.bruno.pokedex
+package com.bruno.pokedex.presentation
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -10,9 +10,8 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.bruno.pokedex.theme.PokedexTheme
-import com.bruno.pokedex.ui.detailpokemon.DetailPokemonScreen
-import com.bruno.pokedex.ui.pokemon.PokemonScreen
+import com.bruno.pokedex.presentation.theme.PokedexTheme
+import com.bruno.pokedex.presentation.ui.detailpokemon.DetailPokemonScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

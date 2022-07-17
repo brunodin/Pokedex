@@ -1,6 +1,8 @@
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
+    id "kotlin-kapt"
+    id "dagger.hilt.android.plugin"
 }
 
 android {
@@ -36,7 +38,7 @@ android {
         compose true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion compose_version
+        kotlinCompilerExtensionVersion Version.compose
     }
     packagingOptions {
         resources {
@@ -46,17 +48,30 @@ android {
 }
 
 dependencies {
-
-    implementation 'androidx.core:core-ktx:1.7.0'
-    implementation "androidx.compose.ui:ui:$compose_version"
-    implementation "androidx.compose.material:material:$compose_version"
-    implementation "androidx.compose.ui:ui-tooling-preview:$compose_version"
-    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.3.1'
-    implementation 'androidx.activity:activity-compose:1.3.1'
-    testImplementation 'junit:junit:4.13.2'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.3'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
-    androidTestImplementation "androidx.compose.ui:ui-test-junit4:$compose_version"
-    debugImplementation "androidx.compose.ui:ui-tooling:$compose_version"
-    debugImplementation "androidx.compose.ui:ui-test-manifest:$compose_version"
+    implementation "androidx.core:core-ktx:${Version.core}"
+    implementation "androidx.compose.ui:ui:${Version.compose}"
+    implementation "androidx.compose.material:material:${Version.compose}"
+    implementation "androidx.compose.ui:ui-tooling-preview:${Version.compose}"
+    implementation "androidx.lifecycle:lifecycle-runtime-ktx:${Version.lifecycle}"
+    implementation "androidx.activity:activity-compose:${Version.activityCompose}"
+    implementation "com.squareup.retrofit2:retrofit:${Version.retrofit}"
+    implementation "com.squareup.retrofit2:converter-gson:${Version.retrofit}"
+    implementation "androidx.test:core:${Version.androidx}"
+    implementation "androidx.test:rules:${Version.androidx}"
+    implementation "androidx.test:runner:${Version.androidx}"
+    implementation "androidx.hilt:hilt-navigation-compose:${Version.hiltNavigation}"
+    implementation "io.coil-kt:coil-compose:${Version.coil}"
+    implementation "io.coil-kt:coil:${Version.coil}"
+    implementation "com.google.dagger:hilt-android:${Version.hilt}"
+    implementation "androidx.biometric:biometric:${Version.biometrics}"
+    implementation "androidx.navigation:navigation-compose:${Version.navigationCompose}"
+    kapt "com.google.dagger:hilt-android-compiler:${Version.hilt}"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:${Version.coroutineTest}"
+    testImplementation "io.mockk:mockk:${Version.mockk}"
+    testImplementation "junit:junit:${Version.junit}"
+    androidTestImplementation "androidx.test.ext:junit:${Version.androixJunit}"
+    androidTestImplementation "androidx.test.espresso:espresso-core:${Version.espresso}"
+    androidTestImplementation "androidx.compose.ui:ui-test-junit4:${Version.compose}"
+    debugImplementation "androidx.compose.ui:ui-tooling:${Version.compose}"
+    debugImplementation "androidx.compose.ui:ui-test-manifest:${Version.compose}"
 }

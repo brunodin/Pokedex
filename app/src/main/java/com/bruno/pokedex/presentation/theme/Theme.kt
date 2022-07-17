@@ -1,4 +1,4 @@
-package com.bruno.pokedex.theme
+package com.bruno.pokedex.presentation.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material.MaterialTheme

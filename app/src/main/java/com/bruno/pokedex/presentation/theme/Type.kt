@@ -1,4 +1,4 @@
-package com.bruno.pokedex.theme
+package com.bruno.pokedex.presentation.theme
 
 import androidx.compose.material.Typography
 import androidx.compose.ui.text.TextStyle
