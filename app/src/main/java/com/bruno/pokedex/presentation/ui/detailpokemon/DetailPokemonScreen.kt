@@ -24,6 +24,9 @@ import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -39,6 +42,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import coil.compose.rememberAsyncImagePainter
 import com.bruno.pokedex.R
 import com.bruno.pokedex.presentation.theme.PokedexTheme
 import com.bruno.pokedex.presentation.theme.Primary100
@@ -48,12 +53,18 @@ import com.bruno.pokedex.presentation.theme.Support200
 import com.bruno.pokedex.presentation.theme.Support300
 
 @Composable
-fun DetailPokemonScreen(pokemonId: Int) {
-    Screen()
+fun DetailPokemonScreen(
+    viewModel: DetailPokemonViewModel = hiltViewModel(),
+    pokemonId: Int
+) {
+    LaunchedEffect(key1 = Unit) { viewModel.setup(pokemonId) }
+    Screen(uiState = viewModel.uiState)
 }
 
 @Composable
-private fun Screen() {
+private fun Screen(uiState: DetailPokemonScreenUiState) {
+    val name by uiState.name.collectAsState()
+    val image by uiState.image.collectAsState()
     PokedexTheme {
         val ambientHeight =
             with(LocalDensity.current) { LocalConfiguration.current.screenHeightDp.dp.toPx() }
@@ -100,7 +111,7 @@ private fun Screen() {
                     ) {
                         Text(
                             modifier = Modifier.padding(bottom = 20.dp),
-                            text = "Pokemon",
+                            text = name.replaceFirstChar { it.uppercase() },
                             fontSize = 25.sp,
                             fontWeight = FontWeight.Bold,
                             color = Primary100
@@ -215,7 +226,7 @@ private fun Screen() {
                     }
                 }
                 Image(
-                    painter = painterResource(id = R.drawable.image),
+                    painter = rememberAsyncImagePainter(model = image),
                     contentDescription = null,
                     modifier = Modifier
                         .size(120.dp)
