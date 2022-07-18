@@ -298,7 +298,8 @@ private fun TextFieldWithBorder(
                 backgroundColor = Support100,
                 unfocusedBorderColor = Support200,
                 focusedBorderColor = Support200,
-                focusedLabelColor = Support200
+                focusedLabelColor = Support200,
+                cursorColor = Support200,
             ),
             keyboardOptions = KeyboardOptions.Default.copy(
                 capitalization = KeyboardCapitalization.Sentences,
@@ -312,7 +313,10 @@ private fun TextFieldWithBorder(
                 )
             },
             label = {
-                if (isFocused.not() && search.isEmpty()) Text(text = stringResource(id = R.string.pokemon_search))
+                if (isFocused.not() && search.isEmpty()) Text(
+                    text = stringResource(id = R.string.pokemon_search),
+                    color = Support300
+                )
             }
         )
     }
