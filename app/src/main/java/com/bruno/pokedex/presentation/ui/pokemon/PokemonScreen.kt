@@ -240,7 +240,7 @@ private fun PokemonCard(
                     model = pokemon.imageUrl,
                     loading = {
                         CircularProgressIndicator(
-                            color = Secondary100,
+                            color = Primary100,
                             modifier = Modifier.scale(0.5f)
                         )
                     },
