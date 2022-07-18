@@ -1,17 +1,20 @@
 package com.bruno.pokedex.presentation.ui.pokemon
 
+import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.bruno.pokedex.domain.model.Pokemon
 import com.bruno.pokedex.domain.model.PokemonPaginated
 import com.bruno.pokedex.domain.usecase.FilterValuesUseCase
 import com.bruno.pokedex.domain.usecase.GetPokemonPaginatedUseCase
+import com.bruno.pokedex.presentation.ui.pokemon.PokemonScreenAction.CloseClickedAction
 import com.bruno.pokedex.presentation.ui.pokemon.PokemonScreenAction.EndReachedAction
 import com.bruno.pokedex.presentation.ui.pokemon.PokemonScreenAction.PokemonClickedAction
-import com.bruno.pokedex.presentation.ui.pokemon.PokemonScreenAction.RetryAction
+import com.bruno.pokedex.presentation.ui.pokemon.PokemonScreenAction.RetryClickedAction
 import com.bruno.pokedex.presentation.ui.pokemon.PokemonScreenAction.SearchChangedAction
 import com.bruno.pokedex.presentation.ui.pokemon.PokemonScreenAction.SearchClickedAction
 import com.bruno.pokedex.presentation.ui.pokemon.PokemonViewModel.ScreenEvent
+import com.bruno.pokedex.presentation.ui.pokemon.PokemonViewModel.ScreenEvent.Finish
 import com.bruno.pokedex.presentation.ui.pokemon.PokemonViewModel.ScreenEvent.NavigateToScreen
 import com.bruno.pokedex.util.EMPTY_STRING
 import com.bruno.pokedex.util.EventFlow
@@ -43,7 +46,8 @@ class PokemonViewModel @Inject constructor(
             SearchClickedAction -> filterPokemon()
             is SearchChangedAction -> performUpdateSearch(action.search)
             EndReachedAction -> performNextPaginationRequest()
-            RetryAction -> fetchGetPokemonPaginated()
+            RetryClickedAction -> fetchGetPokemonPaginated()
+            CloseClickedAction -> viewModelScope.sendEvent(Finish)
         }
     }
 
@@ -55,7 +59,7 @@ class PokemonViewModel @Inject constructor(
     private fun filterPokemon() = viewModelScope.launch {
         val search = uiState.search.value
         val pokemonList = filterValuesUseCase.execute(pokemonList, search)
-        uiState.onSuccess(pokemonList.toList())
+        uiState.pokemonList.value = pokemonList.toList()
     }
 
     private fun performFirstPaginatedList() {
@@ -82,8 +86,24 @@ class PokemonViewModel @Inject constructor(
 
     private fun checkPageIsFirst() = page == FIRST_PAGE
 
+    @VisibleForTesting(otherwise = VisibleForTesting.NONE)
+    fun setupPokemonList(pokemonList: List<Pokemon>) {
+        this.pokemonList.addAll(pokemonList)
+    }
+
+    @VisibleForTesting(otherwise = VisibleForTesting.NONE)
+    fun setupCount(count: Int = 1) {
+        this.count = count
+    }
+
+    @VisibleForTesting(otherwise = VisibleForTesting.NONE)
+    fun setupPage() {
+        this.page = 1
+    }
+
     sealed class ScreenEvent {
         data class NavigateToScreen(val pokemon: Pokemon) : ScreenEvent()
+        object Finish: ScreenEvent()
     }
 
     private companion object {

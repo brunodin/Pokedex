@@ -1,5 +1,6 @@
 package com.bruno.pokedex.presentation.ui.pokemon
 
+import android.app.Activity
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -37,10 +38,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.focus.onFocusEvent
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -61,15 +59,17 @@ import com.bruno.pokedex.presentation.theme.Support300
 import com.bruno.pokedex.presentation.ui.common.ColumnWithGradient
 import com.bruno.pokedex.presentation.ui.common.DefaultImage
 import com.bruno.pokedex.presentation.ui.common.IconImageButton
+import com.bruno.pokedex.presentation.ui.common.ScreenError
+import com.bruno.pokedex.presentation.ui.common.ScreenLoading
+import com.bruno.pokedex.presentation.ui.pokemon.PokemonScreenAction.CloseClickedAction
 import com.bruno.pokedex.presentation.ui.pokemon.PokemonScreenAction.EndReachedAction
 import com.bruno.pokedex.presentation.ui.pokemon.PokemonScreenAction.PokemonClickedAction
-import com.bruno.pokedex.presentation.ui.pokemon.PokemonScreenAction.RetryAction
+import com.bruno.pokedex.presentation.ui.pokemon.PokemonScreenAction.RetryClickedAction
 import com.bruno.pokedex.presentation.ui.pokemon.PokemonScreenAction.SearchChangedAction
 import com.bruno.pokedex.presentation.ui.pokemon.PokemonScreenAction.SearchClickedAction
 import com.bruno.pokedex.presentation.ui.pokemon.PokemonScreenUiState.ScreenState
 import com.bruno.pokedex.presentation.ui.pokemon.PokemonViewModel.ScreenEvent
 import com.bruno.pokedex.util.rememberEndReachedState
-import kotlinx.coroutines.flow.collect
 
 private const val COLUMN_GRID = 2
 
@@ -78,20 +78,23 @@ fun PokemonScreen(
     viewModel: PokemonViewModel = hiltViewModel(),
     onNextScreen: (Pokemon) -> Unit
 ) {
+    val activity = LocalContext.current as Activity
     LaunchedEffect(key1 = Unit) { viewModel.setup() }
     Screen(uiState = viewModel.uiState, onEvent = viewModel::onEvent)
-    EventConsumer(viewModel = viewModel, onNextScreen = onNextScreen)
+    EventConsumer(activity = activity, viewModel = viewModel, onNextScreen = onNextScreen)
 }
 
 @Composable
 private fun EventConsumer(
     viewModel: PokemonViewModel,
-    onNextScreen: (Pokemon) -> Unit
+    onNextScreen: (Pokemon) -> Unit,
+    activity: Activity
 ) {
     LaunchedEffect(key1 = Unit) {
         viewModel.eventFlow.collect { event ->
             when(event) {
                 is ScreenEvent.NavigateToScreen -> { onNextScreen(event.pokemon) }
+                ScreenEvent.Finish -> activity.finish()
             }
         }
     }
@@ -105,8 +108,11 @@ private fun Screen(
     val screenState by uiState.screenState.collectAsState()
     PokedexTheme {
         when (screenState) {
-            ScreenState.Failure -> {}
-            ScreenState.Loading -> {}
+            ScreenState.Failure -> ScreenError(
+                onRetryClicked = { onEvent(RetryClickedAction) },
+                onErrorCloseClicked = { onEvent(CloseClickedAction) }
+            )
+            ScreenState.Loading -> ScreenLoading()
             ScreenState.Success -> ScreenSuccess(uiState = uiState, onEvent = onEvent)
         }
     }
@@ -215,7 +221,7 @@ private fun PokemonCard(
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(color = Secondary100, shape = RoundedCornerShape(10.dp))
-                    .size(58.dp),
+                    .size(48.dp),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
@@ -256,7 +262,7 @@ private fun RetryIconButton(
         IconImageButton(
             painter = painterResource(id = R.drawable.ic_reload),
             modifier = Modifier.size(50.dp),
-            onClick = { onEvent(RetryAction) }
+            onClick = { onEvent(RetryClickedAction) }
         )
     }
 }

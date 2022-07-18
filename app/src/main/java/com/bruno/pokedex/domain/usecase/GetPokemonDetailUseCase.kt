@@ -7,12 +7,12 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 
 class GetPokemonDetailUseCase @Inject constructor(
-    private val dispatcher: CoroutineDispatcher,
-    private val repository: PokemonRepository
+    private val repository: PokemonRepository,
+    private val dispatcher: CoroutineDispatcher
 ) {
 
     suspend fun execute(pokemonId: Int) = withContext(dispatcher) {
-        val result = repository.getPokemonInfo(pokemonId)
+        val result = repository.getPokemonDetail(pokemonId)
         val pokemonDetail = result.getOrNull() ?: return@withContext result
         val newPokemonDetail = pokemonDetail.copy(
             height = convertValue(pokemonDetail.height),

@@ -1,11 +1,13 @@
 package com.bruno.pokedex.presentation.ui.detailpokemon
 
+import android.app.Activity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -19,7 +21,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Divider
-import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -34,6 +35,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -50,6 +52,14 @@ import com.bruno.pokedex.presentation.theme.Support200
 import com.bruno.pokedex.presentation.theme.Support300
 import com.bruno.pokedex.presentation.ui.common.ColumnWithGradient
 import com.bruno.pokedex.presentation.ui.common.DefaultImage
+import com.bruno.pokedex.presentation.ui.common.IconImageButton
+import com.bruno.pokedex.presentation.ui.common.ScreenError
+import com.bruno.pokedex.presentation.ui.common.ScreenLoading
+import com.bruno.pokedex.presentation.ui.detailpokemon.DetailPokemonScreenAction.BackClickedAction
+import com.bruno.pokedex.presentation.ui.detailpokemon.DetailPokemonScreenAction.CloseClickedAction
+import com.bruno.pokedex.presentation.ui.detailpokemon.DetailPokemonScreenAction.RetryClickedAction
+import com.bruno.pokedex.presentation.ui.detailpokemon.DetailPokemonScreenUiState.ScreenState
+import com.bruno.pokedex.presentation.ui.detailpokemon.DetailPokemonViewModel.ScreenEvent
 import com.bruno.pokedex.presentation.ui.detailpokemon.mapper.color
 import com.bruno.pokedex.presentation.ui.detailpokemon.mapper.stats
 import com.bruno.pokedex.util.vertical
@@ -59,47 +69,84 @@ fun DetailPokemonScreen(
     viewModel: DetailPokemonViewModel = hiltViewModel(),
     pokemonId: Int
 ) {
+    val activity = LocalContext.current as Activity
     LaunchedEffect(key1 = Unit) { viewModel.setup(pokemonId) }
-    Screen(uiState = viewModel.uiState)
+    Screen(uiState = viewModel.uiState, viewModel::onEvent)
+    EventConsumer(activity = activity, viewModel = viewModel)
 }
 
 @Composable
-private fun Screen(uiState: DetailPokemonScreenUiState) {
-    val pokemonDetail by uiState.pokemonDetail.collectAsState()
+private fun EventConsumer(
+    activity: Activity,
+    viewModel: DetailPokemonViewModel
+) {
+    LaunchedEffect(key1 = Unit) {
+        viewModel.eventFlow.collect { event ->
+            when (event) {
+                ScreenEvent.GoBack -> activity.onBackPressed()
+                ScreenEvent.Finish -> activity.finish()
+            }
+        }
+    }
+}
+
+@Composable
+private fun Screen(
+    uiState: DetailPokemonScreenUiState,
+    onEvent: (DetailPokemonScreenAction) -> Unit
+) {
+    val screenState by uiState.screenState.collectAsState()
     PokedexTheme {
-        ColumnWithGradient(
-            modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState()),
-            endY = 0.5f,
-            colors = listOf(Support100, Secondary100),
+        when (screenState) {
+            ScreenState.Failure -> ScreenError(
+                onRetryClicked = { onEvent(RetryClickedAction) },
+                onErrorCloseClicked = { onEvent(CloseClickedAction) }
+            )
+            ScreenState.Loading -> ScreenLoading()
+            ScreenState.Success -> ScreenSuccess(uiState = uiState, onEvent = onEvent)
+        }
+    }
+}
+
+@Composable
+private fun ScreenSuccess(
+    uiState: DetailPokemonScreenUiState,
+    onEvent: (DetailPokemonScreenAction) -> Unit
+) {
+    val pokemonDetail by uiState.pokemonDetail.collectAsState()
+    ColumnWithGradient(
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState()),
+        endY = 0.5f,
+        colors = listOf(Support100, Secondary100),
+    ) {
+        IconImageButton(
+            onClick = { onEvent(BackClickedAction) },
+            painter = painterResource(id = R.drawable.ic_arrow_back)
+        )
+        Box(modifier = Modifier.fillMaxSize()) {
+            Column(
+                modifier = Modifier
+                    .offset(y = 75.dp)
+                    .padding(end = 20.dp, start = 20.dp, bottom = 75.dp + 20.dp)
+                    .background(color = Support100, shape = MaterialTheme.shapes.medium),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-            IconButton(onClick = { /*TODO*/ }) {
-                DefaultImage(painter = painterResource(id = R.drawable.ic_arrow_back))
+                PokemonCardName(uiState = uiState)
+                PokemonType(uiState = uiState)
+                PokemonStatsCard(uiState = uiState)
+                Spacer(modifier = Modifier.height(30.dp))
+                BaseStatSText()
+                DividerBaseStats()
+                StatusBarRow(uiState = uiState)
             }
-            Box(modifier = Modifier.fillMaxSize()) {
-                Column(
-                    modifier = Modifier
-                        .offset(y = 75.dp)
-                        .padding(end = 20.dp, start = 20.dp, bottom = 20.dp)
-                        .background(color = Support100, shape = MaterialTheme.shapes.medium),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    PokemonCardName(uiState = uiState)
-                    PokemonType(uiState = uiState)
-                    PokemonStatsCard(uiState = uiState)
-                    Spacer(modifier = Modifier.height(30.dp))
-                    BaseStatSText()
-                    DividerBaseStats()
-                    StatusBarRow(uiState = uiState)
-                }
-                DefaultImage(
-                    painter = rememberAsyncImagePainter(model = pokemonDetail.imageUrl),
-                    modifier = Modifier
-                        .size(120.dp)
-                        .align(alignment = Alignment.TopCenter)
-                )
-            }
+            DefaultImage(
+                painter = rememberAsyncImagePainter(model = pokemonDetail.imageUrl),
+                modifier = Modifier
+                    .size(120.dp)
+                    .align(alignment = Alignment.TopCenter)
+            )
         }
     }
 }
@@ -156,7 +203,7 @@ private fun PokemonType(uiState: DetailPokemonScreenUiState) {
                 backgroundColor = Primary100
             ) {
                 Text(
-                    modifier = Modifier.padding(horizontal = 15.dp, vertical = 5.dp),
+                    modifier = Modifier.padding(horizontal = 15.dp),
                     text = type,
                     fontSize = 15.sp,
                     fontWeight = FontWeight.Bold,
@@ -170,28 +217,32 @@ private fun PokemonType(uiState: DetailPokemonScreenUiState) {
 @Composable
 private fun PokemonStatsCard(uiState: DetailPokemonScreenUiState) {
     val pokemonDetail by uiState.pokemonDetail.collectAsState()
-    val iconTextList = listOf(
-        R.drawable.ic_balance to stringResource(id = R.string.pokemon_details_kg, pokemonDetail.weight),
-        R.drawable.ic_height to stringResource(id = R.string.pokemon_details_meter, pokemonDetail.height)
-    )
     Row(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp),
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
-        iconTextList.forEach { iconText ->
-            CardWithBorder(
-                shape = RoundedCornerShape(5.dp),
-                modifier = Modifier
-                    .padding(top = 10.dp, end = 5.dp, start = 20.dp)
-                    .height(40.dp)
-                    .weight(1f),
-            ) {
-                IconText(
-                    icon = painterResource(id = iconText.first),
-                    text = iconText.second
-                )
-            }
-        }
+        CardIconText(
+            text = stringResource(id = R.string.pokemon_details_kg, pokemonDetail.weight),
+            icon = painterResource(id = R.drawable.ic_balance)
+        )
+        Spacer(modifier = Modifier.width(10.dp))
+        CardIconText(
+            text = stringResource(id = R.string.pokemon_details_meter, pokemonDetail.height),
+            icon = painterResource(id = R.drawable.ic_height)
+        )
+    }
+}
+
+@Composable
+private fun RowScope.CardIconText(text: String, icon: Painter) {
+    CardWithBorder(
+        shape = RoundedCornerShape(5.dp),
+        modifier = Modifier
+            .padding(top = 10.dp)
+            .height(40.dp)
+            .weight(1f),
+    ) {
+        IconText(icon = icon, text = text)
     }
 }
 

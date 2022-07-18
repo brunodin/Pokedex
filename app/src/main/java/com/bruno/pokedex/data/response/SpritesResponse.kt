@@ -10,4 +10,16 @@ data class SpritesResponse(
     val frontShiny: String?,
     @SerializedName("other")
     val other: OtherResponse?,
-)
+) {
+    companion object {
+        fun mock() = SpritesResponse(
+            frontDefault = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png",
+            frontShiny = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png",
+            other = OtherResponse(
+                officialArtwork = OfficialArtworkResponse(
+                    frontDefault = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png"
+                )
+            )
+        )
+    }
+}

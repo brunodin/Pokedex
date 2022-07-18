@@ -8,4 +8,14 @@ data class TypeDetailResponse(
     val slot: Int?,
     @SerializedName("type")
     val type: TypeResponse?
-)
+) {
+    companion object {
+        fun mock() = TypeDetailResponse(
+            slot = 1,
+            type = TypeResponse(
+                name = "Fire",
+                url = ""
+            )
+        )
+    }
+}

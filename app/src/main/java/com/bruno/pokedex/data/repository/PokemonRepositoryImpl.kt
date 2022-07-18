@@ -21,7 +21,7 @@ class PokemonRepositoryImpl @Inject constructor(
             api.getPokemonPaginated(page).toPokemonPaginated()
         }
 
-    override suspend fun getPokemonInfo(pokemonId: Int): Result<PokemonDetail> =
+    override suspend fun getPokemonDetail(pokemonId: Int): Result<PokemonDetail> =
         safeRequest(coroutineDispatcher) {
             api.getPokemonDetail(pokemonId).toPokemonDetail()
         }

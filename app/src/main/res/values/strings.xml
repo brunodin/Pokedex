@@ -14,4 +14,8 @@
     <string name="pokemon_details_special_def">SpdDef</string>
     <string name="pokemon_details_speed">Spd</string>
     <string name="pokemon_details_percentage">%d%%</string>
+    <!--    Error-->
+    <string name="pokemon_error_title">Ooops!</string>
+    <string name="pokemon_error_subtitle">Wasn’t able to complete this request.</string>
+    <string name="pokemon_error_button">Try Again</string>
 </resources>

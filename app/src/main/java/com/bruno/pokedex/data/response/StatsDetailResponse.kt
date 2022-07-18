@@ -10,4 +10,15 @@ data class StatsDetailResponse(
     val effort: Int?,
     @SerializedName("stat")
     val stat: StatsResponse?
-)
+) {
+    companion object {
+        fun mock() = StatsDetailResponse(
+            baseStat = 120,
+            effort = 1,
+            stat = StatsResponse(
+                name = "hp",
+                url = ""
+            )
+        )
+    }
+}

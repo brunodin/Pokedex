@@ -20,4 +20,17 @@ data class PokemonDetailResponse(
     val types: List<TypeDetailResponse>?,
     @SerializedName("weight")
     val weight: Int?
-)
+) {
+    companion object {
+        fun mock() = PokemonDetailResponse(
+            baseExperience = 123,
+            height = 15,
+            id = 1,
+            name = "Bulbasaur",
+            sprites = SpritesResponse.mock(),
+            stats = listOf(StatsDetailResponse.mock()),
+            types = listOf(TypeDetailResponse.mock()),
+            weight = 965
+        )
+    }
+}
