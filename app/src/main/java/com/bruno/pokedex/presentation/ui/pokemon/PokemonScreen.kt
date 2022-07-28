@@ -300,6 +300,8 @@ private fun TextFieldWithBorder(
                 focusedBorderColor = Support200,
                 focusedLabelColor = Support200,
                 cursorColor = Support200,
+                textColor = Support200,
+                disabledTextColor = Support200
             ),
             keyboardOptions = KeyboardOptions.Default.copy(
                 capitalization = KeyboardCapitalization.Sentences,
