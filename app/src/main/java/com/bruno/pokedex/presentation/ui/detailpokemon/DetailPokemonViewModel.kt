@@ -40,10 +40,10 @@ class DetailPokemonViewModel @Inject constructor(
 
     private fun fetchPokemonDetails() = viewModelScope.launch {
         uiState.onLoading()
-        getPokemonDetailUseCase.execute(pokemonId)
-        val pokemonDetail = getPokemonDetailUseCase.execute(pokemonId).getOrElse { uiState.onFailure() }
-        if (pokemonDetail !is PokemonDetail) return@launch
-        uiState.onSuccess(pokemonDetail.toPokemonDetailScreen())
+        getPokemonDetailUseCase.execute(pokemonId).fold(
+            onSuccess = { uiState.onSuccess(it.toPokemonDetailScreen()) },
+            onFailure = { uiState.onFailure() }
+        )
     }
 
     @VisibleForTesting(otherwise = VisibleForTesting.NONE)

@@ -76,8 +76,13 @@ class PokemonViewModel @Inject constructor(
 
     private fun fetchGetPokemonPaginated() = viewModelScope.launch {
         uiState.onLoading(::checkPageIsFirst)
-        val pokemonPaginated = getPokemonUseCase.execute(page).getOrElse { uiState.onFailure(::checkPageIsFirst) }
-        if (pokemonPaginated !is PokemonPaginated) return@launch
+        getPokemonUseCase.execute(page).fold(
+            onFailure = { uiState.onFailure(::checkPageIsFirst) },
+            onSuccess = ::configPokemonPaginatedSuccess
+        )
+    }
+
+    private fun configPokemonPaginatedSuccess(pokemonPaginated: PokemonPaginated) {
         count = pokemonPaginated.count
         page = page.inc()
         pokemonList.addAll(pokemonPaginated.pokemonList)
