@@ -133,7 +133,7 @@ private fun ScreenSuccess(
             ColumnWithGradient(
                 paddingValues = PaddingValues(all = 20.dp),
                 colors = listOf(Primary100, Secondary100),
-                endY = 0.6f,
+                endY = 0.7f,
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(space = 20.dp)
             ) {

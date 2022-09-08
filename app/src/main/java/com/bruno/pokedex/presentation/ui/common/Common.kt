@@ -2,7 +2,6 @@ package com.bruno.pokedex.presentation.ui.common
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -25,11 +24,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -38,6 +34,7 @@ import androidx.compose.ui.unit.sp
 import com.bruno.pokedex.R
 import com.bruno.pokedex.presentation.theme.Support100
 import com.bruno.pokedex.presentation.theme.Support200
+import com.bruno.pokedex.util.drawGradient
 
 
 @Composable
@@ -59,23 +56,14 @@ fun ColumnWithGradient(
     colors: List<Color>,
     content: @Composable () -> Unit
 ) {
-    var height = LocalConfiguration.current.screenHeightDp.dp.value
     Column(
         modifier = modifier
-            .onGloballyPositioned {
-                height = it.size.height.toFloat()
-            }
-            .background(
-                brush = Brush.verticalGradient(
-                    colors = colors,
-                    endY = (height * endY)
-                )
-            )
+            .drawGradient(endY = endY, colors = colors)
             .padding(paddingValues = paddingValues),
         verticalArrangement = verticalArrangement,
         horizontalAlignment = horizontalAlignment
     ) {
-        content()
+            content()
     }
 }
 

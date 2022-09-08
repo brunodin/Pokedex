@@ -62,7 +62,7 @@ import com.bruno.pokedex.presentation.ui.detailpokemon.DetailPokemonScreenUiStat
 import com.bruno.pokedex.presentation.ui.detailpokemon.DetailPokemonViewModel.ScreenEvent
 import com.bruno.pokedex.presentation.ui.detailpokemon.mapper.color
 import com.bruno.pokedex.presentation.ui.detailpokemon.mapper.stats
-import com.bruno.pokedex.util.vertical
+import com.bruno.pokedex.util.drawVertical
 
 @Composable
 fun DetailPokemonScreen(
@@ -218,7 +218,9 @@ private fun PokemonType(uiState: DetailPokemonScreenUiState) {
 private fun PokemonStatsCard(uiState: DetailPokemonScreenUiState) {
     val pokemonDetail by uiState.pokemonDetail.collectAsState()
     Row(
-        modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 10.dp),
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
         CardIconText(
@@ -334,8 +336,8 @@ private fun StatsBar(
                 fontSize = 13.sp,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier
-                    .vertical()
-                    .rotate(90f)
+                    .background(Color.Blue)
+                    .drawVertical()
                     .padding(start = 5.dp)
             )
         }
